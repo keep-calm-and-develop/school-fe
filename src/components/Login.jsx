@@ -60,7 +60,7 @@ const Login = () => {
           passwd,
         },
       )
-      localStorage.setItem('token', response.data.token)
+      sessionStorage.setItem('token', response.data.token)
       navigate('/school')
     } catch (error) {
       setError('Invalid username or password')
