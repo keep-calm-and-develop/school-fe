@@ -62,6 +62,11 @@ function SchoolForm() {
   const fetchData = async () => {
     const result = await axios.get(
       `${Constants.REACT_APP_SERVER_URL}/api/school-data`,
+      {
+        headers: {
+          'Content-Security-Policy': 'upgrade-insecure-requests',
+        },
+      },
     )
     setData(result.data)
   }
@@ -73,7 +78,15 @@ function SchoolForm() {
     event.preventDefault()
 
     axios
-      .post(`${Constants.REACT_APP_SERVER_URL}/api/school`, { name })
+      .post(
+        `${Constants.REACT_APP_SERVER_URL}/api/school`,
+        { name },
+        {
+          headers: {
+            'Content-Security-Policy': 'upgrade-insecure-requests',
+          },
+        },
+      )
       .then((response) => {
         setRes(response.data)
         setName('')

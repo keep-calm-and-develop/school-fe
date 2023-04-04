@@ -59,6 +59,11 @@ const Login = () => {
           username,
           passwd,
         },
+        {
+          headers: {
+            'Content-Security-Policy': 'upgrade-insecure-requests',
+          },
+        },
       )
       sessionStorage.setItem('token', response.data.token)
       navigate('/school')

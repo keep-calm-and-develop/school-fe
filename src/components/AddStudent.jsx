@@ -68,6 +68,11 @@ const AddUser = () => {
     async function fetchData() {
       const response = await fetch(
         `${Constants.REACT_APP_SERVER_URL}/api/${id}`,
+        {
+          headers: {
+            'Content-Security-Policy': 'upgrade-insecure-requests',
+          },
+        },
       )
       const data = await response.text()
       setSchoolName(data)
@@ -142,6 +147,7 @@ const AddUser = () => {
         .post(`${Constants.REACT_APP_SERVER_URL}/api/student`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
+            'Content-Security-Policy': 'upgrade-insecure-requests',
           },
         })
         .then((response) => {
