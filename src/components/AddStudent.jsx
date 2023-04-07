@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, toUpperCase } from 'react'
 import {
   FormGroup,
   FormControl,
@@ -11,6 +11,8 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
+  Select,
+  MenuItem,
 } from '@material-ui/core'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
@@ -25,7 +27,7 @@ const initialValue = {
   address: '',
   mobile_1: '',
   mobile_2: '',
-  city: '',
+  grno: '',
   standard: '',
   division: '',
   blood_group: '',
@@ -89,7 +91,7 @@ const AddUser = () => {
     address,
     mobile_1,
     mobile_2,
-    city,
+    grno,
     standard,
     division,
     blood_group,
@@ -129,7 +131,7 @@ const AddUser = () => {
     formData.append('mobile_1', mobile_1)
     formData.append('mobile_2', mobile_2)
     formData.append('address', address)
-    formData.append('city', city)
+    formData.append('grno', grno)
     formData.append('standard', standard)
     formData.append('division', division)
     formData.append('school_id', id)
@@ -169,7 +171,7 @@ const AddUser = () => {
             {schoolName.toUpperCase()}
           </Typography>
           <Typography style={{ color: 'darkblue' }} variant="h6" align="center">
-            Add Student Data
+            Student Data
           </Typography>
 
           <FormControl>
@@ -178,7 +180,7 @@ const AddUser = () => {
               id="full_name"
               name="full_name"
               label="Name"
-              value={full_name}
+              value={full_name.toUpperCase()}
               onChange={(e) => onValueChange(e)}
               variant="outlined"
             />
@@ -239,7 +241,6 @@ const AddUser = () => {
           </FormControl>
           <FormControl>
             <TextField
-              required
               name="blood_group"
               value={blood_group}
               id="blood_group"
@@ -261,7 +262,7 @@ const AddUser = () => {
               id="address"
               name="address"
               label="Address"
-              value={address}
+              value={address.toUpperCase()}
               onChange={(e) => onValueChange(e)}
               variant="outlined"
             />
@@ -310,11 +311,10 @@ const AddUser = () => {
           </FormControl>
           <FormControl>
             <TextField
-              required
-              id="city"
-              name="city"
-              label="City"
-              value={city}
+              id="grno"
+              name="grno"
+              label="GR No."
+              value={grno}
               onChange={(e) => onValueChange(e)}
               variant="outlined"
             />
@@ -327,15 +327,33 @@ const AddUser = () => {
           /> */}
           </FormControl>
           <FormControl>
-            <TextField
+            <InputLabel style={{ marginLeft: 14 }}>Standard</InputLabel>
+            <Select
               required
               id="standard"
-              name="standard"
               label="Standard"
+              name="standard"
               value={standard}
               onChange={(e) => onValueChange(e)}
               variant="outlined"
-            />
+            >
+              <MenuItem value={"I"}>I</MenuItem>
+              <MenuItem value={"II"}>II</MenuItem>
+              <MenuItem value={"III"}>III</MenuItem>
+              <MenuItem value={"IV"}>IV</MenuItem>
+              <MenuItem value={"V"}>V</MenuItem>
+              <MenuItem value={"VI"}>VI</MenuItem>
+              <MenuItem value={"VII"}>VII</MenuItem>
+              <MenuItem value={"VIII"}>VIII</MenuItem>
+              <MenuItem value={"IX"}>IX</MenuItem>
+              <MenuItem value={"X"}>X</MenuItem>
+              <MenuItem value={"XI SCIENCE"}>XI SCIENCE</MenuItem>
+              <MenuItem value={"XII SCIENCE"}>XII SCIENCE</MenuItem>
+              <MenuItem value={"XI COMMERCE"}>XI COMMERCE</MenuItem>
+              <MenuItem value={"XII COMMERCE"}>XII COMMERCE</MenuItem>
+              <MenuItem value={"XI ARTS"}>XI ARTS</MenuItem>
+              <MenuItem value={"XII ARTS"}>XII ARTS</MenuItem>
+            </Select>            
             {/* <InputLabel htmlFor="my-input">Standard</InputLabel>
           <OutlinedInput
             onChange={(e) => onValueChange(e)}
@@ -349,7 +367,7 @@ const AddUser = () => {
               required
               id="division"
               name="division"
-              label="division"
+              label="Division"
               value={division}
               onChange={(e) => onValueChange(e)}
               variant="outlined"
@@ -387,7 +405,7 @@ const AddUser = () => {
           </FormControl>
           <FormControl>
             <Button variant="contained" color="primary" onClick={uploadFile}>
-              Add User
+              Submit
             </Button>
           </FormControl>
         </FormGroup>
