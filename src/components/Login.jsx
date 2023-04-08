@@ -123,13 +123,6 @@ const Login = () => {
               </p>
             </form>
           </div>
-          <Box mt={8}>
-            <Typography variant="body2" color="textSecondary" align="center">
-              {'© '}
-              {new Date().getFullYear()}
-              {' Your Website'}
-            </Typography>
-          </Box>
         </Container>
       </>
     </>
