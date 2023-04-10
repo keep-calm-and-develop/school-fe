@@ -125,7 +125,7 @@ const AddUser = () => {
 
     const myNewFile = new File(
       [file],
-      `${schoolName}-${unique_id}.${file.name.split('.').pop()}`,
+      `${id}-${unique_id}.${file.name.split('.').pop()}`,
       {
         type: file.type,
       },

@@ -121,7 +121,7 @@ const TableComponent = ({ data }) => {
                       color="primary"
                       style={{ margin: '10px' }}
                       onClick={() => {
-                        fetchZip(row.name)
+                        fetchZip(row.id)
                       }}
                     >
                       Download Photos
