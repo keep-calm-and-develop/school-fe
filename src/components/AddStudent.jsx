@@ -138,7 +138,7 @@ const AddUser = () => {
     )
     formData.append('mobile_1', mobile_1)
     formData.append('mobile_2', mobile_2)
-    formData.append('address', address)
+    formData.append('address', address.toUpperCase())
     formData.append('grno', grno)
     formData.append('standard', standard)
     formData.append('division', division)
