@@ -32,7 +32,7 @@ const initialValue = {
   standard: '',
   division: '',
   blood_group: '',
-  date_of_birth: '2012-01-01',
+  date_of_birth: '',
 }
 
 const useStyles = makeStyles((theme) => ({
