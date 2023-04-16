@@ -21,6 +21,7 @@ import axios from 'axios'
 const TableComponent = ({ data }) => {
   const [modal, setModal] = useState(false)
   const [res, setRes] = useState({})
+  const [message, setMessage] = useState('')
   const fetchZip = async (school) => {
     await axios
       .get(
@@ -79,6 +80,51 @@ const TableComponent = ({ data }) => {
         setModal(true)
       })
   }
+  const deleteData = async (school) => {
+    await axios
+      .delete(
+        `${Constants.REACT_APP_SERVER_URL}/api/data-delete?school=${school}`,
+        {
+          headers: {
+            'Content-Security-Policy': 'upgrade-insecure-requests',
+          },
+        },
+      )
+      .then((response) => {
+        setMessage(response.data.message)
+        setModal(true)
+        // const blob = new Blob([response.data], {
+        //   type: response.headers['content-type'],
+        // })
+      })
+      .catch((error) => {
+        console.error('Error downloading file:', error)
+        setModal(true)
+      })
+  }
+  const deletePhotos = async (school) => {
+    console.log(school)
+    await axios
+      .delete(
+        `${Constants.REACT_APP_SERVER_URL}/api/photos-delete?school=${school}`,
+        {
+          headers: {
+            'Content-Security-Policy': 'upgrade-insecure-requests',
+          },
+        },
+      )
+      .then((response) => {
+        setMessage(response.data.message)
+        setModal(true)
+        // const blob = new Blob([response.data], {
+        //   type: response.headers['content-type'],
+        // })
+      })
+      .catch((error) => {
+        console.error('Error deleting file:', error)
+        setModal(true)
+      })
+  }
   const handleCloseModal = () => {
     setModal(false)
   }
@@ -105,27 +151,51 @@ const TableComponent = ({ data }) => {
                   </a>
                 </TableCell>
                 <TableCell>
-                  <div class="row">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => {
-                        fetchData(row.id)
-                      }}
-                      style={{ margin: '10px' }}
-                    >
-                      Download Excel
-                    </Button>{' '}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      style={{ margin: '10px' }}
-                      onClick={() => {
-                        fetchZip(row.id)
-                      }}
-                    >
-                      Download Photos
-                    </Button>
+                  <div className="column">
+                    <div className="row">
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                          fetchData(row.id)
+                        }}
+                        style={{ margin: '10px' }}
+                      >
+                        Download Excel
+                      </Button>{' '}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        style={{ margin: '10px' }}
+                        onClick={() => {
+                          fetchZip(row.id)
+                        }}
+                      >
+                        Download Photos
+                      </Button>
+                    </div>
+                    <div className="row">
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => {
+                          deleteData(row.id)
+                        }}
+                        style={{ margin: '10px' }}
+                      >
+                        Delete All Data
+                      </Button>{' '}
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        style={{ margin: '10px' }}
+                        onClick={() => {
+                          deletePhotos(row.id)
+                        }}
+                      >
+                        Delete Photos
+                      </Button>
+                    </div>
                   </div>
                 </TableCell>
               </TableRow>
@@ -148,7 +218,7 @@ const TableComponent = ({ data }) => {
                   variant="h6"
                   align="center"
                 >
-                  {'No school data found'}
+                  {message === '' ? 'No school data found' : message}
                 </Typography>
               </div>
               <br />

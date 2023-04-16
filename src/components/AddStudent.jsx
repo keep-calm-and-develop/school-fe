@@ -32,7 +32,7 @@ const initialValue = {
   standard: '',
   division: '',
   blood_group: '',
-  date_of_birth: '2012-01-01',
+  date_of_birth: '',
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -112,8 +112,23 @@ const AddUser = () => {
   }
 
   const saveFile = (e) => {
-    setFile(e.target.files[0])
-    setFileName(e.target.files[0].name)
+    e.preventDefault()
+    const file = e.target.files[0]
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i
+    if (!allowedExtensions.exec(file.name)) {
+      alert('Invalid file type. Please upload an image file.')
+      return
+    }
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      alert('File size exceeds the allowed limit of 5MB.')
+      return
+    }
+    if (file.size < maxSize && allowedExtensions.exec(file.name)) {
+      console.log('inside this')
+      setFile(e.target.files[0])
+      setFileName(e.target.files[0].name)
+    }
   }
   const handleDialogClose = () => {
     setDialogOpen(false)
@@ -122,7 +137,14 @@ const AddUser = () => {
 
   const uploadFile = async (e) => {
     const unique_id = uuid().slice(0, 8)
-
+    if (date_of_birth === '') {
+      alert('Please add Date of birth')
+      return
+    }
+    if (file === undefined) {
+      alert('Invalid file type. Please upload an image file.')
+      return
+    }
     const myNewFile = new File(
       [file],
       `${id}-${unique_id}.${file.name.split('.').pop()}`,
