@@ -127,6 +127,7 @@ const TableComponent = ({ data }) => {
   }
   const handleCloseModal = () => {
     setModal(false)
+    window.location.reload(false)
   }
   return (
     <>
