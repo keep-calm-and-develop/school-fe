@@ -13,6 +13,7 @@ import {
   DialogActions,
   Select,
   MenuItem,
+  Box,
 } from '@material-ui/core'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
@@ -130,6 +131,8 @@ const AddUser = () => {
       setFileName(e.target.files[0].name)
     }
   }
+
+  console.log('file', { file })
   const handleDialogClose = () => {
     setDialogOpen(false)
     window.location.reload(false)
@@ -437,6 +440,11 @@ const AddUser = () => {
                 accept="image/*"
                 variant="outlined"
               />
+              <Box m={1} >
+                {
+                  file && <img style={{ width: '200px', objectFit: 'contain' }} src={URL.createObjectURL(file)} alt='student-photo-id' />
+                }
+              </Box>
               {/* <TextField
             type="file"
             label="Upload Image"
