@@ -399,6 +399,21 @@ const AddUser = () => {
                 <MenuItem value={'XII COMMERCE'}>XII COMMERCE</MenuItem>
                 <MenuItem value={'XI ARTS'}>XI ARTS</MenuItem>
                 <MenuItem value={'XII ARTS'}>XII ARTS</MenuItem>
+                <MenuItem value={'FYJC SCIENCE'}>FYJC SCIENCE</MenuItem>
+                <MenuItem value={'SYJC SCIENCE'}>SYJC SCIENCE</MenuItem>
+                <MenuItem value={'FYJC COMMERCE'}>FYJC COMMERCE</MenuItem>
+                <MenuItem value={'SYJC COMMERCE'}>SYJC COMMERCE</MenuItem>
+                <MenuItem value={'FYJC ARTS'}>FYJC ARTS</MenuItem>
+                <MenuItem value={'SYJC ARTS'}>SYJC ARTS</MenuItem>
+                <MenuItem value={'F.Y.BSc'}>F.Y.BSc</MenuItem>
+                <MenuItem value={'S.Y.BSc'}>S.Y.BSc</MenuItem>
+                <MenuItem value={'T.Y.BSc'}>T.Y.BSc</MenuItem>
+                <MenuItem value={'F.Y.BCOM'}>F.Y.BCOM</MenuItem>
+                <MenuItem value={'S.Y.BCOM'}>S.Y.BCOM</MenuItem>
+                <MenuItem value={'T.Y.BCOM'}>T.Y.BCOM</MenuItem>
+                <MenuItem value={'F.Y.BA'}>F.Y.BA</MenuItem>
+                <MenuItem value={'S.Y.BA'}>S.Y.BA</MenuItem>
+                <MenuItem value={'T.Y.BA'}>T.Y.BA</MenuItem>
               </Select>
               {/* <InputLabel htmlFor="my-input">Standard</InputLabel>
           <OutlinedInput
