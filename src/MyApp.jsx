@@ -5,6 +5,7 @@ import SchoolForm from './components/AddSchool'
 import AddUser from './components/AddStudent'
 
 import Login from './components/Login'
+import Reports from './components/Reports'
 
 const MyApp = () => {
   return (
@@ -15,6 +16,7 @@ const MyApp = () => {
           <Route path="/school" element={<SchoolForm />} />
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/school/reports/:id" element={<Reports />}></Route>
         </Routes>
       </Router>
     </div>

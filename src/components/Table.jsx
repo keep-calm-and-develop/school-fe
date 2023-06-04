@@ -16,12 +16,14 @@ import {
   DialogContent,
   DialogActions,
 } from '@material-ui/core'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 const TableComponent = ({ data }) => {
   const [modal, setModal] = useState(false)
   const [res, setRes] = useState({})
   const [message, setMessage] = useState('')
+  const navigate = useNavigate()
   const fetchZip = async (school) => {
     await axios
       .get(
@@ -125,6 +127,9 @@ const TableComponent = ({ data }) => {
         setModal(true)
       })
   }
+  const showReports = (id) => {
+    navigate(`/school/reports/${id}`)
+  }
   const handleCloseModal = () => {
     setModal(false)
     window.location.reload(false)
@@ -139,6 +144,7 @@ const TableComponent = ({ data }) => {
               <TableCell>Name</TableCell>
               <TableCell>URL</TableCell>
               <TableCell>Actions</TableCell>
+              <TableCell>Reports</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -198,6 +204,18 @@ const TableComponent = ({ data }) => {
                       </Button>
                     </div>
                   </div>
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    style={{ margin: '10px' }}
+                    onClick={() => {
+                      showReports(row.id)
+                    }}
+                  >
+                    Show Report
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
