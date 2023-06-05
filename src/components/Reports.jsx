@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { useParams } from 'react-router-dom'
 import {
   Table,
   TableContainer,
@@ -84,7 +85,8 @@ const Reports = () => {
     mobile1: '',
     standard: 'All Standards',
   })
-  const schoolId = '1001'
+  const { id } = useParams()
+  const schoolId = id
 
   useEffect(() => {
     fetchStudents()
