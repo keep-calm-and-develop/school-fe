@@ -383,6 +383,9 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               >
+                <MenuItem value={'Nursery'}>Nursery</MenuItem>
+                <MenuItem value={'Jr. KG'}>Jr. KG</MenuItem>
+                <MenuItem value={'Sr. KG'}>Sr. KG</MenuItem>
                 <MenuItem value={'I'}>I</MenuItem>
                 <MenuItem value={'II'}>II</MenuItem>
                 <MenuItem value={'III'}>III</MenuItem>
