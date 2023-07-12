@@ -148,10 +148,6 @@ const AddUser = () => {
       alert('Invalid file type. Please upload an image file.')
       return
     }
-    if (school_name.includes("Cannot find School with id")==true){
-      alert('School not found')
-      return
-    }
     const myNewFile = new File(
       [file],
       `${id}-${unique_id}.${file.name.split('.').pop()}`,
