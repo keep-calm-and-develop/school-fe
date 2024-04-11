@@ -6,7 +6,6 @@ import {
   Button,
   CssBaseline,
   TextField,
-  Box,
   Typography,
   makeStyles,
   Container,
@@ -48,7 +47,6 @@ const Login = () => {
   const [username, setUsername] = useState('')
   const [passwd, setPasswd] = useState('')
   const [error, setError] = useState('')
-  //   const [rememberMe, setRememberMe] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()

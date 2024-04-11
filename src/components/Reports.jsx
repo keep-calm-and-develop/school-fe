@@ -87,19 +87,8 @@ const Reports = () => {
   })
   const { id } = useParams()
   const schoolId = id
-
-  useEffect(() => {
-    fetchStudents()
-  }, [currentPage])
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = date.getFullYear()
-    return `${day}-${month}-${year}`
-  }
-
+  
+  
   const fetchStudents = async () => {
     try {
       const params = {
@@ -123,6 +112,17 @@ const Reports = () => {
     } catch (error) {
       console.error('Error fetching students:', error)
     }
+  }
+  useEffect(() => {
+    fetchStudents()
+  }, [currentPage]) // eslint-disable-line
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}-${month}-${year}`
   }
 
   const handlePageChange = (newPage) => {
