@@ -21,6 +21,8 @@ import moment from 'moment'
 import { v4 as uuid } from 'uuid'
 import * as Constants from './Constants'
 import instructions from './../instructions.jpg'
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 const initialValue = {
   photo: null,
   photo_name: '',
@@ -139,22 +141,28 @@ const AddUser = () => {
   }
 
   const uploadFile = async (e) => {
-    const unique_id = uuid().slice(0, 8)
-    if (date_of_birth === '') {
-      alert('Please add Date of birth')
-      return
-    }
-    if (file === undefined) {
-      alert('Invalid file type. Please upload an image file.')
-      return
-    }
-    const myNewFile = new File(
+    try {
+      const unique_id = uuid().slice(0, 8)
+      if (date_of_birth === '') {
+        alert('Please add Date of birth')
+        return
+      }
+      if (file === undefined) {
+        alert('Invalid file type. Please upload an image file.')
+        return
+      }
+      const myNewFile = new File(
       [file],
       `${id}-${unique_id}.${file.name.split('.').pop()}`,
       {
-        type: file.type,
+          type: file.type,
       },
-    )
+      )
+      const storage = getStorage();
+      const storageRef = ref(storage, `/${id}/${myNewFile.name}`);
+      const { ref: imageRef } = await uploadBytes(storageRef, myNewFile)
+      const downloadURL = await getDownloadURL(imageRef);
+
     const formData = new FormData()
     formData.append('full_name', full_name.toUpperCase())
     formData.append(
@@ -173,21 +181,17 @@ const AddUser = () => {
       'date_of_birth',
       moment(date_of_birth).format('YYYY-MM-DD hh:mm:ss'),
     )
-    formData.append('photo', myNewFile)
-    formData.append('photo_name', myNewFile.name)
+    formData.append('photo_name', downloadURL)
 
-    // formData.append('fileName', fileName)
-    try {
-      const res = await axios
-        .post(`${Constants.REACT_APP_SERVER_URL}/api/student`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Content-Security-Policy': 'upgrade-insecure-requests',
-          },
-        })
-        .then((response) => {
-          setDialogOpen(true)
-        })
+    formData.append('fileName', fileName)
+    await axios
+      .post(`${Constants.REACT_APP_SERVER_URL}/api/student`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Content-Security-Policy': 'upgrade-insecure-requests',
+        },
+      })
+      setDialogOpen(true)
     } catch (ex) {
       console.log(ex)
     }

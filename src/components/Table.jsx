@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
+import JSZip from 'jszip';
 import * as Constants from './Constants'
 import {
   Table,
@@ -18,40 +19,38 @@ import {
 } from '@material-ui/core'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { getDownloadURL, getStorage, ref, listAll, getMetadata } from 'firebase/storage'
 
 const TableComponent = ({ data }) => {
+  const jszip = useMemo(() => new JSZip(), []);
   const [modal, setModal] = useState(false)
   const [res, setRes] = useState({})
   const [message, setMessage] = useState('')
   const navigate = useNavigate()
   const fetchZip = async (school) => {
-    await axios
-      .get(
-        `${Constants.REACT_APP_SERVER_URL}/api/all-photos?school=${school}`,
-        { responseType: 'blob' },
-        {
-          headers: {
-            'Content-Security-Policy': 'upgrade-insecure-requests',
-          },
-        },
-      )
-      .then((response) => {
-        const blob = new Blob([response.data], {
-          type: response.headers['content-type'],
-        })
-
-        const filename = `${school}.zip`
-
-        // Create a download link with the filename and click it
-        const link = document.createElement('a')
-        link.href = window.URL.createObjectURL(blob)
-        link.download = filename
-        link.click()
-      })
-      .catch((error) => {
-        console.error('Error downloading file:', error)
-        setModal(true)
-      })
+    try {
+      const storage = getStorage();
+      const folderRef = ref(storage, school.toString());
+      const folder = await listAll(folderRef);
+      const promises = folder.items.map(async (image) => {
+        const file = await getMetadata(image);
+        const fileRef = ref(storage, image.fullPath);
+        const downloadURL = await getDownloadURL(fileRef);
+        let fileBlob = await fetch(downloadURL);
+        fileBlob = await fileBlob.blob();
+        jszip.file(file.name, fileBlob);
+      });
+      await Promise.all(promises);
+      const blob = await jszip.generateAsync({ type: 'blob' });
+      
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `${school}.zip`;
+      link.click();
+    } catch (error) {
+      console.error('Error downloading file:', error)
+      setModal(true)
+    }
   }
   const fetchData = async (school) => {
     await axios
@@ -151,11 +150,8 @@ const TableComponent = ({ data }) => {
             {data.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
-                <TableCell style={{ width: '200px' }}>{row.name}</TableCell>
-                <TableCell>
-                  <a href={`${Constants.REACT_APP_DOMAIN_URL}` + row.id}>
-                    {`${Constants.REACT_APP_DOMAIN_URL}` + row.id}
-                  </a>
+                <TableCell style={{ width: '200px' }}>
+                    <a href={`${window.location}/${row.id}`}>{row.name}</a>
                 </TableCell>
                 <TableCell>
                   <div className="column">
@@ -228,7 +224,7 @@ const TableComponent = ({ data }) => {
             <br />
             <div style={{ margin: '20px' }}>
               <Typography variant="h3" align="center">
-                {'Oops!'}
+                {message !== '' ? 'Successful' : 'Oops!'}
               </Typography>
               <br />
               <div>

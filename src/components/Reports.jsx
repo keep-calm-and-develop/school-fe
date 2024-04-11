@@ -225,8 +225,8 @@ const Reports = () => {
                 <TableCell>
                   {student.photo_name && (
                     <img
-                      src={`${Constants.REACT_APP_SERVER_URL}/public/uploads/${schoolId}/${student.photo_name}`}
-                      alt="Student Photo"
+                      src={student.photo_name}
+                      alt={student.full_name}
                       style={{ width: '80px' }}
                     />
                   )}

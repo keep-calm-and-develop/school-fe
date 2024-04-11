@@ -163,7 +163,7 @@ function SchoolForm() {
                 <DialogContent>
                   <Typography variant="h5" align="center">
                     {res.success === true
-                      ? `${Constants.REACT_APP_DOMAIN_URL}` + res.school.id
+                      ? `${window.location}/${res.school.id}`
                       : res.error}
                   </Typography>
                 </DialogContent>
