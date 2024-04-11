@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   FormGroup,
   FormControl,
@@ -135,10 +135,10 @@ const AddUser = () => {
     }
   }
 
-  const handleDialogClose = () => {
+  const handleDialogClose = useCallback(() => {
     setDialogOpen(false)
     window.location.reload(false)
-  }
+  }, []);
 
   const uploadFile = async (e) => {
     if (file === undefined) {
