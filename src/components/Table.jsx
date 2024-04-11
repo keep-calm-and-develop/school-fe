@@ -11,20 +11,17 @@ import {
   Paper,
   Button,
   Typography,
-  TextField,
-  InputAdornment,
   Dialog,
-  DialogContent,
   DialogActions,
 } from '@material-ui/core'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { getDownloadURL, getStorage, ref, listAll, getMetadata } from 'firebase/storage'
+import { LoadingButton } from './LoadingButton';
 
 const TableComponent = ({ data }) => {
   const jszip = useMemo(() => new JSZip(), []);
   const [modal, setModal] = useState(false)
-  const [res, setRes] = useState({})
   const [message, setMessage] = useState('')
   const navigate = useNavigate()
   const fetchZip = async (school) => {
@@ -52,8 +49,8 @@ const TableComponent = ({ data }) => {
       setModal(true)
     }
   }
-  const fetchData = async (school) => {
-    await axios
+  const fetchData = (school) => {
+    return axios
       .get(
         `${Constants.REACT_APP_SERVER_URL}/api/data-download?school=${school}`,
         { responseType: 'blob' },
@@ -104,7 +101,6 @@ const TableComponent = ({ data }) => {
       })
   }
   const deletePhotos = async (school) => {
-    console.log(school)
     await axios
       .delete(
         `${Constants.REACT_APP_SERVER_URL}/api/photos-delete?school=${school}`,
@@ -156,48 +152,48 @@ const TableComponent = ({ data }) => {
                 <TableCell>
                   <div className="column">
                     <div className="row">
-                      <Button
+                      <LoadingButton
                         variant="contained"
                         color="primary"
                         onClick={() => {
-                          fetchData(row.id)
+                          return fetchData(row.id)
                         }}
                         style={{ margin: '10px' }}
                       >
                         Download Excel
-                      </Button>{' '}
-                      <Button
+                      </LoadingButton>{' '}
+                      <LoadingButton
                         variant="contained"
                         color="primary"
                         style={{ margin: '10px' }}
                         onClick={() => {
-                          fetchZip(row.id)
+                          return fetchZip(row.id)
                         }}
                       >
                         Download Photos
-                      </Button>
+                      </LoadingButton>
                     </div>
                     <div className="row">
-                      <Button
+                      <LoadingButton
                         variant="contained"
                         color="secondary"
                         onClick={() => {
-                          deleteData(row.id)
+                          return deleteData(row.id)
                         }}
                         style={{ margin: '10px' }}
                       >
                         Delete All Data
-                      </Button>{' '}
-                      <Button
+                      </LoadingButton>{' '}
+                      <LoadingButton
                         variant="contained"
                         color="secondary"
                         style={{ margin: '10px' }}
                         onClick={() => {
-                          deletePhotos(row.id)
+                          return deletePhotos(row.id)
                         }}
                       >
                         Delete Photos
-                      </Button>
+                      </LoadingButton>
                     </div>
                   </div>
                 </TableCell>
@@ -236,12 +232,6 @@ const TableComponent = ({ data }) => {
                   {message === '' ? 'No school data found' : message}
                 </Typography>
               </div>
-              <br />
-              <DialogContent>
-                <Typography variant="h5" align="center">
-                  {res.error}
-                </Typography>
-              </DialogContent>
               <br />
               <DialogActions>
                 <Button

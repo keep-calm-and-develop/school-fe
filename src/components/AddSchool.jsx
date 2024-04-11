@@ -61,15 +61,19 @@ function SchoolForm() {
   }, [navigate])
 
   const fetchData = async () => {
-    const result = await axios.get(
-      `${Constants.REACT_APP_SERVER_URL}/api/school-data`,
-      {
-        headers: {
-          'Content-Security-Policy': 'upgrade-insecure-requests',
+    try {
+      const result = await axios.get(
+        `${Constants.REACT_APP_SERVER_URL}/api/school-data`,
+        {
+          headers: {
+            'Content-Security-Policy': 'upgrade-insecure-requests',
+          },
         },
-      },
-    )
-    setData(result.data)
+      )
+      setData(result.data)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const handleCloseModal = () => {
