@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, toUpperCase } from 'react'
 import {
   FormGroup,
   FormControl,
@@ -21,9 +21,6 @@ import moment from 'moment'
 import { v4 as uuid } from 'uuid'
 import * as Constants from './Constants'
 import instructions from './../instructions.jpg'
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
-import { LoadingButton } from './LoadingButton'
-
 const initialValue = {
   photo: null,
   photo_name: '',
@@ -37,6 +34,7 @@ const initialValue = {
   division: '',
   blood_group: '',
   date_of_birth: '',
+  house: '',
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -80,25 +78,24 @@ const AddUser = () => {
 
   useEffect(() => {
     async function fetchData() {
-      try {
-        const response = await fetch(
-          `${Constants.REACT_APP_SERVER_URL}/api/${id}`,
-          {
-            headers: {
-              'Content-Security-Policy': 'upgrade-insecure-requests',
-            },
+      const response = await fetch(
+        `${Constants.REACT_APP_SERVER_URL}/api/${id}`,
+        {
+          headers: {
+            'Content-Security-Policy': 'upgrade-insecure-requests',
           },
-        )
-        const data = await response.text()
-        setSchoolName(data)
-      } catch (error) {
-        console.error(error)
-      }
+        },
+      )
+      const data = await response.text()
+      setSchoolName(data)
+      // setIsSchoolEnabled(data !== 'School not found')
     }
     fetchData()
   }, [id])
 
   const {
+    photo,
+    photo_name,
     full_name,
     school_name,
     address,
@@ -109,6 +106,7 @@ const AddUser = () => {
     division,
     blood_group,
     date_of_birth,
+    house,
   } = student
   const classes = useStyles()
 
@@ -130,77 +128,71 @@ const AddUser = () => {
       return
     }
     if (file.size < maxSize && allowedExtensions.exec(file.name)) {
+      console.log('inside this')
       setFile(e.target.files[0])
       setFileName(e.target.files[0].name)
     }
   }
 
-  const handleDialogClose = useCallback(() => {
+  console.log('file', { file })
+  const handleDialogClose = () => {
     setDialogOpen(false)
     window.location.reload(false)
-  }, []);
+  }
 
   const uploadFile = async (e) => {
+    const unique_id = uuid().slice(0, 8)
+    if (date_of_birth === '') {
+      alert('Please add Date of birth')
+      return
+    }
     if (file === undefined) {
       alert('Invalid file type. Please upload an image file.')
       return
     }
-    const unique_id = uuid().slice(0, 8)
     const myNewFile = new File(
       [file],
       `${id}-${unique_id}.${file.name.split('.').pop()}`,
       {
-          type: file.type,
+        type: file.type,
       },
-      )
-    try {
-      if (date_of_birth === '') {
-        alert('Please add Date of birth')
-        return
-      }
-      if (full_name === '') {
-        alert('Please add Full Name')
-        return
-      }
-      if (mobile_1 === '') {
-        alert('Please add Mobile')
-        return
-      }
-      if (address === '') {
-        alert('Please add Address')
-        return
-      }
-      if (division === '') {
-        alert('Please add Division')
-        return
-      }
-      const storage = getStorage();
-      const storageRef = ref(storage, `/${id}/${myNewFile.name}`);
-      const { ref: imageRef } = await uploadBytes(storageRef, myNewFile)
-      const downloadURL = await getDownloadURL(imageRef);
+    )
+    const formData = new FormData()
+    formData.append('full_name', full_name.toUpperCase())
+    formData.append(
+      'school_name',
+      schoolName !== 'School not found' ? schoolName : school_name,
+    )
+    formData.append('mobile_1', mobile_1)
+    formData.append('mobile_2', mobile_2)
+    formData.append('address', address.toUpperCase())
+    formData.append('grno', grno)
+    formData.append('standard', standard)
+    formData.append('division', division)
+    formData.append('school_id', id)
+    formData.append('blood_group', blood_group)
+    formData.append(
+      'date_of_birth',
+      moment(date_of_birth).format('YYYY-MM-DD hh:mm:ss'),
+    )
+    formData.append('house',house)
+    formData.append('photo', myNewFile)
+    formData.append('photo_name', myNewFile.name)
 
-      const requestObj = {
-        full_name: full_name.toUpperCase(),
-        school_name: schoolName !== 'School not found' ? schoolName : school_name,
-        mobile_1,
-        mobile_2,
-        address: address.toUpperCase(),
-        grno,
-        standard,
-        division,
-        school_id: id,
-        blood_group,
-        date_of_birth: moment(date_of_birth).format('YYYY-MM-DD hh:mm:ss'),
-        photo_name: downloadURL,
-        fileName,
-      }
-      await axios.post(`${Constants.REACT_APP_SERVER_URL}/api/student`, requestObj)
-      setDialogOpen(true)
-    } catch (error) {
-      const storage = getStorage();
-      const imageRef = ref(storage, `/${id}/${myNewFile.name}`);
-      await deleteObject(imageRef)
-      console.error(error)
+    // formData.append('fileName', fileName)
+    try {
+      const res = await axios
+        .post(`${Constants.REACT_APP_SERVER_URL}/api/student`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Content-Security-Policy': 'upgrade-insecure-requests',
+          },
+        })
+        .then((response) => {
+          setDialogOpen(true)
+        })
+    } catch (ex) {
+      console.log(ex)
     }
   }
 
@@ -242,6 +234,14 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="my-input">School Name</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="school_name"
+            value={schoolName !== 'School not found' ? schoolName : school_name}
+            disabled={schoolName !== 'School not found'}
+            id="my-input"
+          /> */}
             </FormControl>
             <FormControl>
               <TextField
@@ -253,6 +253,14 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="full_name">Full Name</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="full_name"
+            value={full_name}
+            id="full_name"
+            required={true}
+          /> */}
             </FormControl>
 
             <FormControl>
@@ -260,8 +268,8 @@ const AddUser = () => {
                 required
                 id="date_of_birth"
                 name="date_of_birth"
-                label="Date of Birth"
-                type="date"
+                label="Date of Birth"                
+                type="date"                 
                 variant="outlined"
                 InputLabelProps={{
                   shrink: true,
@@ -269,6 +277,16 @@ const AddUser = () => {
                 value={date_of_birth}
                 onChange={onValueChange}
               />
+
+              {/* <InputLabel htmlFor="my-date">Date of Birth</InputLabel> */}
+              {/* <TextField
+            label="Date of Birth"
+            type="date"
+            onChange={onValueChange}
+            name="date_of_birth"
+            InputLabelProps={{ shrink: true }}
+            value={date_of_birth}
+          /> */}
             </FormControl>
             <FormControl>
               <TextField
@@ -279,6 +297,13 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="my-input">Blood Group</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="blood_group"
+            value={blood_group}
+            id="my-input"
+          /> */}
             </FormControl>
             <FormControl>
               <TextField
@@ -290,6 +315,13 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="my-input">Address</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="address"
+            value={address}
+            id="address"
+          /> */}
             </FormControl>
             <FormControl>
               <TextField
@@ -301,6 +333,13 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="my-input">Mobile 1</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="mobile_1"
+            value={mobile_1}
+            id="my-input"
+          /> */}
             </FormControl>
             <FormControl>
               <TextField
@@ -311,6 +350,13 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="my-input">Mobile 2</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="mobile_2"
+            value={mobile_2}
+            id="mobile_2"
+          /> */}
             </FormControl>
             <FormControl>
               <TextField
@@ -321,6 +367,13 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="my-input">City</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="city"
+            value={city}
+            id="my-input"
+          /> */}
             </FormControl>
             <FormControl>
               <InputLabel style={{ marginLeft: 14 }}>Standard</InputLabel>
@@ -367,7 +420,20 @@ const AddUser = () => {
                 <MenuItem value={'F.Y.BA'}>F.Y.BA</MenuItem>
                 <MenuItem value={'S.Y.BA'}>S.Y.BA</MenuItem>
                 <MenuItem value={'T.Y.BA'}>T.Y.BA</MenuItem>
+                <MenuItem value={'B.Pharm Year 1'}>B.Pharm Year 1</MenuItem>
+                <MenuItem value={'B.Pharm Year 2'}>B.Pharm Year 2</MenuItem>
+                <MenuItem value={'B.Pharm Year 3'}>B.Pharm Year 3</MenuItem>
+                <MenuItem value={'B.Pharm Year 4'}>B.Pharm Year 4</MenuItem>
+                <MenuItem value={'M.Pharm Year 1'}>M.Pharm Year 1</MenuItem>
+                <MenuItem value={'M.Pharm Year 2'}>M.Pharm Year 2</MenuItem>
               </Select>
+              {/* <InputLabel htmlFor="my-input">Standard</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="standard"
+            value={standard}
+            id="standard"
+          /> */}
             </FormControl>
             <FormControl>
               <TextField
@@ -379,6 +445,34 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
+              {/* <InputLabel htmlFor="my-input">Division</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="division"
+            value={division}
+            id="my-input"
+          /> */}
+            </FormControl>
+            <FormControl>
+              <InputLabel style={{ marginLeft: 14 }}>House</InputLabel>
+              <Select
+                required
+                id="house"
+                label="House"
+                name="house"
+                value={house}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              >
+                <MenuItem value={'Green'}>Green</MenuItem>
+                <MenuItem value={'White'}>White</MenuItem>
+                <MenuItem value={'Blue'}>Blue</MenuItem>
+                <MenuItem value={'Red'}>Red</MenuItem>
+                <MenuItem value={'Yellow'}>Yellow</MenuItem>
+                <MenuItem value={'Pink'}>Pink</MenuItem>
+                <MenuItem value={'Black'}>Black</MenuItem>
+                <MenuItem value={'Purple'}>Purple</MenuItem>
+              </Select>
             </FormControl>
             <FormControl>
               <InputLabel shrink htmlFor="upload-file">
@@ -396,7 +490,7 @@ const AddUser = () => {
               />
               <Box m={1} >
                 {
-                  file && <img style={{ width: '200px', objectFit: 'contain' }} src={URL.createObjectURL(file)} alt='id' />
+                  file && <img style={{ width: '200px', objectFit: 'contain' }} src={URL.createObjectURL(file)} alt='student-photo-id' />
                 }
               </Box>
               {/* <TextField
@@ -409,9 +503,9 @@ const AddUser = () => {
           /> */}
             </FormControl>
             <FormControl>
-              <LoadingButton variant="contained" color="primary" onClick={uploadFile}>
+              <Button variant="contained" color="primary" onClick={uploadFile}>
                 Submit
-              </LoadingButton>
+              </Button>
             </FormControl>
           </FormGroup>
           <>
