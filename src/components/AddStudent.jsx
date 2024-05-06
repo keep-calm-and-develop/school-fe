@@ -35,6 +35,10 @@ const initialValue = {
   blood_group: '',
   date_of_birth: '',
   house: '',
+  fathername: '',
+  fathermobile: '',
+  mothername: '',
+  mothermobile: '',
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -107,6 +111,10 @@ const AddUser = () => {
     blood_group,
     date_of_birth,
     house,
+    fathername,
+    fathermobile,
+    mothername,
+    mothermobile,
   } = student
   const classes = useStyles()
 
@@ -166,6 +174,10 @@ const AddUser = () => {
     formData.append('mobile_1', mobile_1)
     formData.append('mobile_2', mobile_2)
     formData.append('address', address.toUpperCase())
+    formData.append('fathername',fathername)
+    formData.append('mothername',mothername)
+    formData.append('fathermobile',fathermobile)
+    formData.append('mothermobile',mothermobile)
     formData.append('grno', grno)
     formData.append('standard', standard)
     formData.append('division', division)
@@ -358,6 +370,51 @@ const AddUser = () => {
             id="mobile_2"
           /> */}
             </FormControl>
+            <FormControl>
+              <TextField
+                required
+                id="fathername"
+                name="fathername"
+                label="Father's Name"
+                value={fathername.toUpperCase()}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />
+             </FormControl>   
+             <FormControl>
+              <TextField
+                required
+                id="fathermobile"
+                name="fathermobile"
+                label="Father's Mobile No."
+                value={fathermobile}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />
+             </FormControl>             
+             <FormControl>
+              <TextField
+                required
+                id="mothername"
+                name="mothername"
+                label="Mother's Name"
+                value={mothername.toUpperCase()}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />
+             </FormControl>   
+             <FormControl>
+              <TextField
+                required
+                id="mothermobile"
+                name="mothermobile"
+                label="Mother's Mobile No."
+                value={mothermobile}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />
+             </FormControl>             
+
             <FormControl>
               <TextField
                 id="grno"
