@@ -174,10 +174,6 @@ const AddUser = () => {
     formData.append('mobile_1', mobile_1)
     formData.append('mobile_2', mobile_2)
     formData.append('address', address.toUpperCase())
-    formData.append('fathername',fathername)
-    formData.append('mothername',mothername)
-    formData.append('fathermobile',fathermobile)
-    formData.append('mothermobile',mothermobile)
     formData.append('grno', grno)
     formData.append('standard', standard)
     formData.append('division', division)
@@ -372,48 +368,72 @@ const AddUser = () => {
             </FormControl>
             <FormControl>
               <TextField
-                required
                 id="fathername"
                 name="fathername"
-                label="Father's Name"
-                value={fathername.toUpperCase()}
+                label="Father Name"
+                value={fathername}
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-             </FormControl>   
-             <FormControl>
+              {/* <InputLabel htmlFor="my-input">City</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="city"
+            value={city}
+            id="my-input"
+          /> */}
+            </FormControl>
+            <FormControl>
               <TextField
-                required
                 id="fathermobile"
                 name="fathermobile"
-                label="Father's Mobile No."
+                label="Father Mobile"
                 value={fathermobile}
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-             </FormControl>             
-             <FormControl>
+              {/* <InputLabel htmlFor="my-input">City</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="city"
+            value={city}
+            id="my-input"
+          /> */}
+            </FormControl>
+            <FormControl>
               <TextField
-                required
                 id="mothername"
                 name="mothername"
-                label="Mother's Name"
-                value={mothername.toUpperCase()}
+                label="Mother Name"
+                value={mothername}
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-             </FormControl>   
-             <FormControl>
+              {/* <InputLabel htmlFor="my-input">City</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="city"
+            value={city}
+            id="my-input"
+          /> */}
+            </FormControl>
+            <FormControl>
               <TextField
-                required
                 id="mothermobile"
                 name="mothermobile"
-                label="Mother's Mobile No."
+                label="Mother Mobile"
                 value={mothermobile}
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-             </FormControl>             
+              {/* <InputLabel htmlFor="my-input">City</InputLabel>
+          <OutlinedInput
+            onChange={(e) => onValueChange(e)}
+            name="city"
+            value={city}
+            id="my-input"
+          /> */}
+            </FormControl>
 
             <FormControl>
               <TextField
