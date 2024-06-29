@@ -2,7 +2,7 @@ export const REACT_APP_SERVER_URL = process.env.REACT_APP_FIREBASE_SERVER_URL ||
 
 // Add school id and field names in array to hide the fields in respective school student form
 export const SCHOOL_HIDDEN_FIELDS = {
-    1001: ['grno', 'standard', 'division'],
+    //1001: ['grno', 'standard', 'division'],
 };
 
 export const SCHOOL_FIELDS = [
@@ -21,4 +21,5 @@ export const SCHOOL_FIELDS = [
     'fathermobile',
     'mothername',
     'mothermobile',
+    'rollno',
 ];

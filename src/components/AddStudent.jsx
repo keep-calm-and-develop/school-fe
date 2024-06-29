@@ -64,6 +64,7 @@ const AddUser = () => {
     fathermobile,
     mothername,
     mothermobile,
+    rollno,
   } = student
   const classes = useStyles()
 
@@ -139,6 +140,9 @@ const AddUser = () => {
     }
     if (showField('division')) {
       formData.append('division', division)
+    }
+    if (showField('rollno')){
+      formData.append('rollno', rollno)
     }
     if (showField('blood_group')) {
       formData.append('blood_group', blood_group)
@@ -334,7 +338,7 @@ const AddUser = () => {
                 variant="outlined"
               />
             </FormControl>}
-            {showField('division') && <FormControl>
+            {showField('standard') && <FormControl>
               <InputLabel style={{ marginLeft: 14 }}>Standard</InputLabel>
               <Select
                 required
@@ -388,8 +392,7 @@ const AddUser = () => {
               </Select>
             </FormControl>}
             {showField('division') && <FormControl>
-              <TextField
-                required
+              <TextField          
                 id="division"
                 name="division"
                 label="Division"
@@ -398,6 +401,16 @@ const AddUser = () => {
                 variant="outlined"
               />
             </FormControl>}
+            {showField('rollno') && <FormControl>
+              <TextField
+                id="rollno"
+                name="rollno"
+                label="Roll No."
+                value={rollno}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />                
+              </FormControl>}
             {showField('house') && <FormControl>
               <InputLabel style={{ marginLeft: 14 }}>House</InputLabel>
               <Select
