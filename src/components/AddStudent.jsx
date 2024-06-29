@@ -1,11 +1,10 @@
-import { useState, useEffect, toUpperCase } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   FormGroup,
   FormControl,
   InputLabel,
   OutlinedInput,
   Button,
-  makeStyles,
   Typography,
   TextField,
   Dialog,
@@ -21,56 +20,8 @@ import moment from 'moment'
 import { v4 as uuid } from 'uuid'
 import * as Constants from './Constants'
 import instructions from './../instructions.jpg'
-const initialValue = {
-  photo: null,
-  photo_name: '',
-  full_name: '',
-  school_name: '',
-  address: '',
-  mobile_1: '',
-  mobile_2: '',
-  grno: '',
-  standard: '',
-  division: '',
-  blood_group: '',
-  date_of_birth: '',
-  house: '',
-  fathername: '',
-  fathermobile: '',
-  mothername: '',
-  mothermobile: '',
-}
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& > *': {
-      margin: theme.spacing(1),
-      border: '1px solid gray',
-      borderRadius: '15px',
-      padding: '8%',
-    },
-  },
-  container: {
-    width: '180%',
-    marginRight: 90,
-    '& > *': {
-      marginTop: theme.spacing(1.2),
-    },
-    backgroundColor: '#f1fff6',
-  },
-
-  formContainer: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-
-  instructionImage: {
-    marginRight: '20px',
-  },
-  image: {
-    maxWidth: '500px',
-  },
-}))
+import { useStyles } from './useStyles'
+import { initialValue } from './initialValue'
 
 const AddUser = () => {
   const [student, setStudent] = useState(initialValue)
@@ -98,8 +49,6 @@ const AddUser = () => {
   }, [id])
 
   const {
-    photo,
-    photo_name,
     full_name,
     school_name,
     address,
@@ -142,7 +91,6 @@ const AddUser = () => {
     }
   }
 
-  console.log('file', { file })
   const handleDialogClose = () => {
     setDialogOpen(false)
     window.location.reload(false)
@@ -166,43 +114,66 @@ const AddUser = () => {
       },
     )
     const formData = new FormData()
-    formData.append('full_name', full_name.toUpperCase())
     formData.append(
       'school_name',
       schoolName !== 'School not found' ? schoolName : school_name,
     )
-    formData.append('mobile_1', mobile_1)
-    formData.append('mobile_2', mobile_2)
-    formData.append('address', address.toUpperCase())
-    formData.append('grno', grno)
-    formData.append('standard', standard)
-    formData.append('division', division)
     formData.append('school_id', id)
-    formData.append('blood_group', blood_group)
-    formData.append(
-      'date_of_birth',
-      moment(date_of_birth).format('YYYY-MM-DD hh:mm:ss'),
-    )
-    formData.append('house',house)
+    if (showField('full_name')) {
+      formData.append('full_name', full_name.toUpperCase())
+    }
+    if (showField('mobile_1')) {
+      formData.append('mobile_1', mobile_1)
+    }
+    if (showField('mobile_2')) {
+      formData.append('mobile_2', mobile_2)
+    }
+    if (showField('address')) {
+      formData.append('address', address.toUpperCase())
+    }
+    if (showField('grno')) {
+      formData.append('grno', grno)
+    }
+    if (showField('standard')) {
+      formData.append('standard', standard)
+    }
+    if (showField('division')) {
+      formData.append('division', division)
+    }
+    if (showField('blood_group')) {
+      formData.append('blood_group', blood_group)
+    }
+    if (showField('date_of_birth')) {
+      formData.append(
+        'date_of_birth',
+        moment(date_of_birth).format('YYYY-MM-DD hh:mm:ss'),
+      )
+    }
+    if (showField('house')) {
+      formData.append('house', house)
+    }
     formData.append('photo', myNewFile)
     formData.append('photo_name', myNewFile.name)
 
     // formData.append('fileName', fileName)
     try {
-      const res = await axios
+      await axios
         .post(`${Constants.REACT_APP_SERVER_URL}/api/student`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             'Content-Security-Policy': 'upgrade-insecure-requests',
           },
-        })
-        .then((response) => {
-          setDialogOpen(true)
-        })
+        });
+      setDialogOpen(true)
     } catch (ex) {
       console.log(ex)
     }
   }
+
+  const showField = useCallback((fieldName) => {
+    const hideFields = Constants.SCHOOL_HIDDEN_FIELDS[id] || [];
+    return !hideFields.includes(fieldName);
+  }, [id]);
 
   return (
     <>
@@ -242,16 +213,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">School Name</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="school_name"
-            value={schoolName !== 'School not found' ? schoolName : school_name}
-            disabled={schoolName !== 'School not found'}
-            id="my-input"
-          /> */}
             </FormControl>
-            <FormControl>
+            {showField('full_name') && <FormControl>
               <TextField
                 required
                 id="full_name"
@@ -261,23 +224,15 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="full_name">Full Name</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="full_name"
-            value={full_name}
-            id="full_name"
-            required={true}
-          /> */}
-            </FormControl>
+            </FormControl>}
 
-            <FormControl>
+            {showField('date_of_birth') && <FormControl>
               <TextField
                 required
                 id="date_of_birth"
                 name="date_of_birth"
-                label="Date of Birth"                
-                type="date"                 
+                label="Date of Birth"
+                type="date"
                 variant="outlined"
                 InputLabelProps={{
                   shrink: true,
@@ -285,18 +240,8 @@ const AddUser = () => {
                 value={date_of_birth}
                 onChange={onValueChange}
               />
-
-              {/* <InputLabel htmlFor="my-date">Date of Birth</InputLabel> */}
-              {/* <TextField
-            label="Date of Birth"
-            type="date"
-            onChange={onValueChange}
-            name="date_of_birth"
-            InputLabelProps={{ shrink: true }}
-            value={date_of_birth}
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('blood_group') && <FormControl>
               <TextField
                 name="blood_group"
                 value={blood_group}
@@ -305,15 +250,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">Blood Group</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="blood_group"
-            value={blood_group}
-            id="my-input"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('address') && <FormControl>
               <TextField
                 required
                 id="address"
@@ -323,15 +261,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">Address</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="address"
-            value={address}
-            id="address"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('mobile_1') && <FormControl>
               <TextField
                 required
                 id="mobile_1"
@@ -341,15 +272,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">Mobile 1</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="mobile_1"
-            value={mobile_1}
-            id="my-input"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('mobile_2') && <FormControl>
               <TextField
                 id="mobile_2"
                 name="mobile_2"
@@ -358,15 +282,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">Mobile 2</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="mobile_2"
-            value={mobile_2}
-            id="mobile_2"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('fathername') && <FormControl>
               <TextField
                 id="fathername"
                 name="fathername"
@@ -375,15 +292,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">City</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="city"
-            value={city}
-            id="my-input"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('fathermobile') && <FormControl>
               <TextField
                 id="fathermobile"
                 name="fathermobile"
@@ -392,15 +302,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">City</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="city"
-            value={city}
-            id="my-input"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('mothername') && <FormControl>
               <TextField
                 id="mothername"
                 name="mothername"
@@ -409,15 +312,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">City</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="city"
-            value={city}
-            id="my-input"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('mothermobile') && <FormControl>
               <TextField
                 id="mothermobile"
                 name="mothermobile"
@@ -426,16 +322,9 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">City</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="city"
-            value={city}
-            id="my-input"
-          /> */}
-            </FormControl>
+            </FormControl>}
 
-            <FormControl>
+            {showField('grno') && <FormControl>
               <TextField
                 id="grno"
                 name="grno"
@@ -444,15 +333,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">City</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="city"
-            value={city}
-            id="my-input"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('division') && <FormControl>
               <InputLabel style={{ marginLeft: 14 }}>Standard</InputLabel>
               <Select
                 required
@@ -504,15 +386,8 @@ const AddUser = () => {
                 <MenuItem value={'M.Pharm Year 1'}>M.Pharm Year 1</MenuItem>
                 <MenuItem value={'M.Pharm Year 2'}>M.Pharm Year 2</MenuItem>
               </Select>
-              {/* <InputLabel htmlFor="my-input">Standard</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="standard"
-            value={standard}
-            id="standard"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('division') && <FormControl>
               <TextField
                 required
                 id="division"
@@ -522,15 +397,8 @@ const AddUser = () => {
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              {/* <InputLabel htmlFor="my-input">Division</InputLabel>
-          <OutlinedInput
-            onChange={(e) => onValueChange(e)}
-            name="division"
-            value={division}
-            id="my-input"
-          /> */}
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('house') && <FormControl>
               <InputLabel style={{ marginLeft: 14 }}>House</InputLabel>
               <Select
                 required
@@ -550,8 +418,8 @@ const AddUser = () => {
                 <MenuItem value={'Black'}>Black</MenuItem>
                 <MenuItem value={'Purple'}>Purple</MenuItem>
               </Select>
-            </FormControl>
-            <FormControl>
+            </FormControl>}
+            {showField('file') && <FormControl>
               <InputLabel shrink htmlFor="upload-file">
                 Upload file
               </InputLabel>
@@ -570,15 +438,7 @@ const AddUser = () => {
                   file && <img style={{ width: '200px', objectFit: 'contain' }} src={URL.createObjectURL(file)} alt='student-photo-id' />
                 }
               </Box>
-              {/* <TextField
-            type="file"
-            label="Upload Image"
-            InputLabelProps={{ shrink: true }}
-            onChange={saveFile}
-            accept="image/*"
-            value={photo}
-          /> */}
-            </FormControl>
+            </FormControl>}
             <FormControl>
               <Button variant="contained" color="primary" onClick={uploadFile}>
                 Submit
