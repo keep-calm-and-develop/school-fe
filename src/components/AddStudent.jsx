@@ -65,6 +65,10 @@ const AddUser = () => {
     mothername,
     mothermobile,
     rollno,
+    designation,
+    date_of_joining,
+    department,
+    emp_code,
   } = student
   const classes = useStyles()
 
@@ -155,6 +159,21 @@ const AddUser = () => {
     }
     if (showField('house')) {
       formData.append('house', house)
+    }
+    if (showField('designation')){
+      formData.append('designation',designation)
+    }
+    if (showField('date_of_joining')){
+      formData.append(
+        'date_of_joining',
+        moment(date_of_joining).format('YYYY-MM-DD hh:mm:ss'),
+      )
+    }
+    if(showField('department')){
+      formData.append('department',department)
+    }
+    if(showField('emp_code')){
+      formData.append('emp_code',emp_code)
     }
     formData.append('photo', myNewFile)
     formData.append('photo_name', myNewFile.name)
@@ -432,6 +451,50 @@ const AddUser = () => {
                 <MenuItem value={'Purple'}>Purple</MenuItem>
               </Select>
             </FormControl>}
+            {showField('designation') && <FormControl>
+              <TextField
+                  id="designation"
+                  name="designation"
+                  label="Designation"
+                  value={designation}
+                  onChange={(e) => onValueChange(e)}
+                  variant="outlined"
+                />                   
+              </FormControl>}
+              {showField('date_of_joining') && <FormControl>
+              <TextField
+                  id="date_of_joining"
+                  name="date_of_joining"
+                  type="date"
+                  label="Date of Joining"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  value={date_of_joining}
+                  onChange={(e) => onValueChange(e)}
+                  variant="outlined"
+                />                   
+              </FormControl>}
+              {showField('department') && <FormControl>
+              <TextField
+                  id="department"
+                  name="department"
+                  label="Department"
+                  value={department}
+                  onChange={(e) => onValueChange(e)}
+                  variant="outlined"
+                />                   
+              </FormControl>}
+              {showField('emp_code') && <FormControl>
+              <TextField
+                  id="emp_code"
+                  name="emp_code"
+                  label="Employee No."
+                  value={emp_code}
+                  onChange={(e) => onValueChange(e)}
+                  variant="outlined"
+                />                   
+              </FormControl>}
             {showField('file') && <FormControl>
               <InputLabel shrink htmlFor="upload-file">
                 Upload file
