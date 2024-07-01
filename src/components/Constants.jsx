@@ -4,6 +4,8 @@ export const REACT_APP_SERVER_URL = process.env.REACT_APP_FIREBASE_SERVER_URL ||
 export const SCHOOL_HIDDEN_FIELDS = {
     1001: ['designation', 'date_of_joining', 'department','emp_code'],
     1002: ['designation', 'date_of_joining', 'department','emp_code'],
+    1017: ['mobile_2','division','blood_group','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
+    1018: ['mobile_2','division','blood_group','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
 };
 
 export const SCHOOL_FIELDS = [
@@ -23,4 +25,8 @@ export const SCHOOL_FIELDS = [
     'mothername',
     'mothermobile',
     'rollno',
+    'designation',
+    'date_of_joining',
+    'department',
+    'emp_code',
 ];
