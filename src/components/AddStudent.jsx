@@ -433,7 +433,6 @@ const AddUser = () => {
             {showField('house') && <FormControl>
               <InputLabel style={{ marginLeft: 14 }}>House</InputLabel>
               <Select
-                required
                 id="house"
                 label="House"
                 name="house"
