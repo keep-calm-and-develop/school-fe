@@ -5,6 +5,7 @@ import {
   InputLabel,
   OutlinedInput,
   Button,
+  makeStyles,
   Typography,
   TextField,
   Dialog,
@@ -20,8 +21,54 @@ import moment from 'moment'
 import { v4 as uuid } from 'uuid'
 import * as Constants from './Constants'
 import instructions from './../instructions.jpg'
-import { useStyles } from './useStyles'
-import { initialValue } from './initialValue'
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { LoadingButton } from './LoadingButton'
+
+const initialValue = {
+  photo: null,
+  photo_name: '',
+  full_name: '',
+  school_name: '',
+  address: '',
+  mobile_1: '',
+  mobile_2: '',
+  grno: '',
+  standard: '',
+  division: '',
+  blood_group: '',
+  date_of_birth: '',
+}
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+      border: '1px solid gray',
+      borderRadius: '15px',
+      padding: '8%',
+    },
+  },
+  container: {
+    width: '180%',
+    marginRight: 90,
+    '& > *': {
+      marginTop: theme.spacing(1.2),
+    },
+    backgroundColor: '#f1fff6',
+  },
+
+  formContainer: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+
+  instructionImage: {
+    marginRight: '20px',
+  },
+  image: {
+    maxWidth: '500px',
+  },
+}))
 
 const AddUser = () => {
   const [student, setStudent] = useState(initialValue)
@@ -33,17 +80,20 @@ const AddUser = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch(
-        `${Constants.REACT_APP_SERVER_URL}/api/${id}`,
-        {
-          headers: {
-            'Content-Security-Policy': 'upgrade-insecure-requests',
+      try {
+        const response = await fetch(
+          `${Constants.REACT_APP_SERVER_URL}/api/${id}`,
+          {
+            headers: {
+              'Content-Security-Policy': 'upgrade-insecure-requests',
+            },
           },
-        },
-      )
-      const data = await response.text()
-      setSchoolName(data)
-      // setIsSchoolEnabled(data !== 'School not found')
+        )
+        const data = await response.text()
+        setSchoolName(data)
+      } catch (error) {
+        console.error(error)
+      }
     }
     fetchData()
   }, [id])
@@ -90,106 +140,94 @@ const AddUser = () => {
       return
     }
     if (file.size < maxSize && allowedExtensions.exec(file.name)) {
-      console.log('inside this')
       setFile(e.target.files[0])
       setFileName(e.target.files[0].name)
     }
   }
 
-  const handleDialogClose = () => {
+  const handleDialogClose = useCallback(() => {
     setDialogOpen(false)
     window.location.reload(false)
-  }
+  }, []);
 
   const uploadFile = async (e) => {
-    const unique_id = uuid().slice(0, 8)
-    if (date_of_birth === '') {
-      alert('Please add Date of birth')
-      return
-    }
-    if (file === undefined) {
+    if (showField('file') && file === undefined) {
       alert('Invalid file type. Please upload an image file.')
       return
     }
-    const myNewFile = new File(
-      [file],
-      `${id}-${unique_id}.${file.name.split('.').pop()}`,
-      {
-        type: file.type,
-      },
-    )
-    const formData = new FormData()
-    formData.append(
-      'school_name',
-      schoolName !== 'School not found' ? schoolName : school_name,
-    )
-    formData.append('school_id', id)
-    if (showField('full_name')) {
-      formData.append('full_name', full_name.toUpperCase())
-    }
-    if (showField('mobile_1')) {
-      formData.append('mobile_1', mobile_1)
-    }
-    if (showField('mobile_2')) {
-      formData.append('mobile_2', mobile_2)
-    }
-    if (showField('address')) {
-      formData.append('address', address.toUpperCase())
-    }
-    if (showField('grno')) {
-      formData.append('grno', grno)
-    }
-    if (showField('standard')) {
-      formData.append('standard', standard)
-    }
-    if (showField('division')) {
-      formData.append('division', division)
-    }
-    if (showField('rollno')){
-      formData.append('rollno', rollno)
-    }
-    if (showField('blood_group')) {
-      formData.append('blood_group', blood_group)
-    }
-    if (showField('date_of_birth')) {
-      formData.append(
-        'date_of_birth',
-        moment(date_of_birth).format('YYYY-MM-DD hh:mm:ss'),
-      )
-    }
-    if (showField('house')) {
-      formData.append('house', house)
-    }
-    if (showField('designation')){
-      formData.append('designation',designation)
-    }
-    if (showField('date_of_joining')){
-      formData.append(
-        'date_of_joining',
-        moment(date_of_joining).format('YYYY-MM-DD hh:mm:ss'),
-      )
-    }
-    if(showField('department')){
-      formData.append('department',department)
-    }
-    if(showField('emp_code')){
-      formData.append('emp_code',emp_code)
-    }
-    formData.append('photo', myNewFile)
-    formData.append('photo_name', myNewFile.name)
-
-    // formData.append('fileName', fileName)
+    let myNewFileName = '';
     try {
-      await axios
-        .post(`${Constants.REACT_APP_SERVER_URL}/api/student`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Content-Security-Policy': 'upgrade-insecure-requests',
+      if (showField('date_of_birth') && date_of_birth === '') {
+        alert('Please add Date of birth')
+        return
+      }
+      if (showField('full_name') && full_name === '') {
+        alert('Please add Full Name')
+        return
+      }
+      if (showField('mobile_1') && mobile_1 === '') {
+        alert('Please add Mobile')
+        return
+      }
+      if (showField('address') && address === '') {
+        alert('Please add Address')
+        return
+      }
+      if (showField('division') && division === '') {
+        alert('Please add Division')
+        return
+      }
+
+      const requestObj = {
+        full_name: full_name.toUpperCase(),
+        school_name: schoolName !== 'School not found' ? schoolName : school_name,
+        mobile_1,
+        mobile_2,
+        address: address.toUpperCase(),
+        grno,
+        standard,
+        division,
+        school_id: id,
+        blood_group,
+        date_of_birth: moment(date_of_birth).format('YYYY-MM-DD hh:mm:ss'),
+        house,
+        fathername,
+        fathermobile,
+        mothername,
+        mothermobile,
+        rollno,
+        designation,
+        date_of_joining,
+        department,
+        emp_code,
+      };
+
+      if (showField('file')) {
+        const unique_id = uuid().slice(0, 8)
+        const myNewFile = new File(
+          [file],
+          `${id}-${unique_id}.${file.name.split('.').pop()}`,
+          {
+            type: file.type,
           },
-        });
+        )
+        const storage = getStorage();
+        const storageRef = ref(storage, `/${id}/${myNewFile.name}`);
+        const { ref: imageRef } = await uploadBytes(storageRef, myNewFile)
+        const downloadURL = await getDownloadURL(imageRef);
+        requestObj.photo_name = downloadURL;
+        requestObj.fileName = fileName;
+        myNewFileName = myNewFile.name;
+      }
+      await axios.post(`${Constants.REACT_APP_SERVER_URL}/api/student`, requestObj)
       setDialogOpen(true)
-    } catch (ex) {
-      console.log(ex)
+    } catch (error) {
+      if (showField('file')) {
+        const storage = getStorage();
+        const imageRef = ref(storage, `/${id}/${myNewFileName}`);
+        await deleteObject(imageRef)
+      }
+      console.error(error)
     }
   }
 
@@ -411,7 +449,7 @@ const AddUser = () => {
               </Select>
             </FormControl>}
             {showField('division') && <FormControl>
-              <TextField          
+              <TextField
                 id="division"
                 name="division"
                 label="Division"
@@ -428,8 +466,8 @@ const AddUser = () => {
                 value={rollno}
                 onChange={(e) => onValueChange(e)}
                 variant="outlined"
-              />                
-              </FormControl>}
+              />
+            </FormControl>}
             {showField('house') && <FormControl>
               <InputLabel style={{ marginLeft: 14 }}>House</InputLabel>
               <Select
@@ -452,72 +490,73 @@ const AddUser = () => {
             </FormControl>}
             {showField('designation') && <FormControl>
               <TextField
-                  id="designation"
-                  name="designation"
-                  label="Designation"
-                  value={designation}
-                  onChange={(e) => onValueChange(e)}
-                  variant="outlined"
-                />                   
-              </FormControl>}
-              {showField('date_of_joining') && <FormControl>
-              <TextField
-                  id="date_of_joining"
-                  name="date_of_joining"
-                  type="date"
-                  label="Date of Joining"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  value={date_of_joining}
-                  onChange={(e) => onValueChange(e)}
-                  variant="outlined"
-                />                   
-              </FormControl>}
-              {showField('department') && <FormControl>
-              <TextField
-                  id="department"
-                  name="department"
-                  label="Department"
-                  value={department}
-                  onChange={(e) => onValueChange(e)}
-                  variant="outlined"
-                />                   
-              </FormControl>}
-              {showField('emp_code') && <FormControl>
-              <TextField
-                  id="emp_code"
-                  name="emp_code"
-                  label="Employee No."
-                  value={emp_code}
-                  onChange={(e) => onValueChange(e)}
-                  variant="outlined"
-                />                   
-              </FormControl>}
-            {showField('file') && <FormControl>
-              <InputLabel shrink htmlFor="upload-file">
-                Upload file
-              </InputLabel>
-              <br />
-              <OutlinedInput
-                required
-                type="file"
-                name="file"
-                id="upload-file"
-                onChange={saveFile}
-                accept="image/*"
+                id="designation"
+                name="designation"
+                label="Designation"
+                value={designation}
+                onChange={(e) => onValueChange(e)}
                 variant="outlined"
               />
-              <Box m={1} >
-                {
-                  file && <img style={{ width: '200px', objectFit: 'contain' }} src={URL.createObjectURL(file)} alt='student-photo-id' />
-                }
-              </Box>
             </FormControl>}
+            {showField('date_of_joining') && <FormControl>
+              <TextField
+                id="date_of_joining"
+                name="date_of_joining"
+                type="date"
+                label="Date of Joining"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={date_of_joining}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />
+            </FormControl>}
+            {showField('department') && <FormControl>
+              <TextField
+                id="department"
+                name="department"
+                label="Department"
+                value={department}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />
+            </FormControl>}
+            {showField('emp_code') && <FormControl>
+              <TextField
+                id="emp_code"
+                name="emp_code"
+                label="Employee No."
+                value={emp_code}
+                onChange={(e) => onValueChange(e)}
+                variant="outlined"
+              />
+            </FormControl>}
+            {showField('file') &&
+              <FormControl>
+                <InputLabel shrink htmlFor="upload-file">
+                  Upload file
+                </InputLabel>
+                <br />
+                <OutlinedInput
+                  required
+                  type="file"
+                  name="file"
+                  id="upload-file"
+                  onChange={saveFile}
+                  accept="image/*"
+                  variant="outlined"
+                />
+                <Box m={1} >
+                  {
+                    file && <img style={{ width: '200px', objectFit: 'contain' }} src={URL.createObjectURL(file)} alt='id' />
+                  }
+                </Box>
+              </FormControl>}
             <FormControl>
-              <Button variant="contained" color="primary" onClick={uploadFile}>
+              <LoadingButton variant="contained" color="primary" onClick={uploadFile}>
                 Submit
-              </Button>
+              </LoadingButton>
             </FormControl>
           </FormGroup>
           <>
