@@ -19,6 +19,9 @@ export const SCHOOL_HIDDEN_FIELDS = {
     1026: ['mobile_2','grno','standard','division','blood_group','date_of_birth','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
     1027: ['mobile_1','mobile_2','grno','division','blood_group','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
     1028: ['mobile_2','grno','division','blood_group','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
+    1029: ['mobile_2','grno','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
+    1030: ['mobile_2','grno','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
+    1031: ['mobile_2','grno','house','fathername','fathermobile','mothername','mothermobile','rollno','designation', 'date_of_joining', 'department','emp_code'],
 };
 
 export const SCHOOL_FIELDS = [
